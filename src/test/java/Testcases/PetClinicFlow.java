@@ -10,6 +10,10 @@ import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -32,7 +36,7 @@ public class PetClinicFlow extends Baseclass {
     }
 
     //Testcase to add a new owner
-    @Test(priority = 4)
+    @Test(priority = 2)
     public void addOwner() {
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
         AddNewOwner ao = new AddNewOwner();
@@ -64,7 +68,7 @@ public class PetClinicFlow extends Baseclass {
     }
 
     //Validate the data displayed matches with input data
-    @Test(priority = 2)
+    @Test(priority = 4)
     public void VerifyInfoPage() {
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
         VerifyInfoPage vip = new VerifyInfoPage();
@@ -74,28 +78,40 @@ public class PetClinicFlow extends Baseclass {
         // List<WebElement>addedOAttri = driver.vip.getTblAddedOwnerDtls();
 
         //Validate owner info
-            int j=0;
-            String OwnerFullName = td.ownerFName + td.ownerLName ;
-            if ((addedOAttri.get(j).getText()).equals(OwnerFullName)&&
-                    addedOAttri.get(j+1).getText().equals(td.ownerAddress) &&
-                    addedOAttri.get(j+2).getText().equals(td.ownerCity) &&
-                    addedOAttri.get(j+3).getText().equals(td.ownerPhone)){
-                Assert.assertTrue(true);
-            }
-            else{
-                Assert.assertTrue(false);
-            }
-        //List<WebElement>addedPAttri = vip.getTblAddedPetDtls();
+        int j = 0;
+        String OwnerFullName = td.ownerFName + td.ownerLName;
+        if ((addedOAttri.get(j).getText()).equals(OwnerFullName) &&
+                addedOAttri.get(j + 1).getText().equals(td.ownerAddress) &&
+                addedOAttri.get(j + 2).getText().equals(td.ownerCity) &&
+                addedOAttri.get(j + 3).getText().equals(td.ownerPhone)) {
+            Assert.assertTrue(true);
+        } else {
+            Assert.assertTrue(false);
+        }
+
+        //converting the date format to match the formats in inputdata page and validation page
+        String dtDOB = td.petDOB; //dtDOB="12/24/2011"
+        DateFormat inputDate = new SimpleDateFormat("MM/dd/yyyy");
+        DateFormat dateFormatNeeded = new SimpleDateFormat("yyyy-MM-dd");
+        Date date;
+        String reqDOB = null;
+        try {
+            date = inputDate.parse(dtDOB);
+            System.out.println(dateFormatNeeded.format(date));
+            reqDOB = dateFormatNeeded.format(date);
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         //Validate Pet info
         int i = 0;
-        List<WebElement>addedPAttri = driver.findElements(By.xpath("//table[@class='table table-striped']/tbody/tr/td/dl/dd"));
-                if(addedPAttri.get(i).getText().equals(td.petName) &&
-                addedPAttri.get(i+1).getText().equals(td.petDOB) &&
-                addedPAttri.get(i+2).getText().equals(td.petType)){
-                Assert.assertTrue(true);
-        }
-        else{
+        List<WebElement> addedPAttri = driver.findElements(By.xpath("//table[@class='table table-striped']/tbody/tr/td/dl/dd"));
+        if (addedPAttri.get(i).getText().equals(td.petName) &&
+                addedPAttri.get(i + 1).getText().equals(reqDOB) &&
+                addedPAttri.get(i + 2).getText().equals(td.petType)) {
+            Assert.assertTrue(true);
+        } else {
             Assert.assertTrue(false);
         }
     }
